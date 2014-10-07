@@ -2,12 +2,13 @@
   "name": "open-plus",
   "main": "./lib/open-plus",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "Open filenames under cursor with ctrl-o",
   "activationEvents": [
     "open-plus:open"
   ],
-  "repository": "https://github.com/atom/open-plus",
+  "repository": "https://github.com/klorenz/atom-open-plus",
   "license": "MIT",
+  "author": "Kay-Uwe (Kiwi) Lorenz <kay@moduleworks.com> (http://quelltexter.com)",
   "engines": {
     "atom": ">0.50.0"
   },
