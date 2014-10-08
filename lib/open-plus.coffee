@@ -16,7 +16,7 @@ isBinaryFile = require 'isbinaryfile'
 module.exports =
   openPlusView: null
 
-  filePattern: /[^\s()!$&'*+,;=]+/g # no spaces or sub-delims from url rfc3986
+  filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
 
   activate: (state) ->
     atom.workspaceView.command "open-plus:open", => @openPlus()
@@ -25,9 +25,9 @@ module.exports =
 
   serialize: ->
 
-  open: (filename) ->
-    if isBinaryFile(filename)
-
+  # open: (filename) ->
+  #   if isBinaryFile(filename)
+  #
   openFile: (filename) ->
     #console.log "filename: #{filename}"
 
@@ -48,9 +48,9 @@ module.exports =
     opts = {}
     if m = filename.match /(.*?):(\d+)(?::(\d+))?:?$/
       filename = m[1]
-      opts.initialLine = m[2]
+      opts.initialLine = parseInt(m[2])
       if m[3]
-        opts.initialColumn = m[3]
+        opts.initialColumn = parseInt(m[3])
 
     editor = atom.workspace.getActiveEditor()
 
@@ -73,13 +73,15 @@ module.exports =
         if isBinaryFile(filename)
           return osOpen filename
 
-        #console.log "open file"
-        return atom.workspace.open(filename, opts).then (editor) =>
-          editor.scrollToCursorPosition()
+        # in case file already opened, initialLine and initialColumn are not
+        # used. so set bufferposition here
+        return atom.workspace.open(filename).then (editor) =>
+          if opts.initialLine?
+            column = opts.initialColumn ? 0
+            editor.setCursorBufferPosition [opts.initialLine-1, column]
 
     # open new file
-    atom.workspace.open(filename, opts).then (editor) =>
-      editor.scrollToCursorPosition()
+    atom.workspace.open(filename, opts)
 
   openPlus: ->
     editor = atom.workspace.getActiveEditor()
@@ -105,4 +107,4 @@ module.exports =
       # cursor was at some whitespace
       text = "" if text.match /\s/
 
-      @open text
+      @openFile text
