@@ -12,6 +12,20 @@ If word under cursor has no extension, and resolved file does not exist,
 extension of current file is added to filename.
 
 
+Xikij Support
+-------------
+
+There is special support for [xikij](http://github.com/klorenz/atom-xikij)
+package.  If you are on a path like
+
+```
+    /etc
+       + fstab
+```
+
+You can hit ctrl+o and file opens in atom or external if binary.
+
+
 Use Cases
 ---------
 
