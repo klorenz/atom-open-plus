@@ -7,14 +7,15 @@ $ npm install isbinaryfile --save
   npm http 200 https://registry.npmjs.org/isbinaryfile
 """
 
-path    = require 'path'
-fs      = require 'fs'
+path         = require 'path'
+fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
-{Range} = require 'atom'
+{Range}      = require 'atom'
 
 
 module.exports =
   openPlusView: null
+  xikij: null
 
   filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
 
@@ -29,7 +30,7 @@ module.exports =
   #   if isBinaryFile(filename)
   #
   openFile: (filename) ->
-    #console.log "filename: #{filename}"
+    console.log "filename: #{filename}"
 
     if not filename
       return atom.workspaceView.trigger "application:open-file"
@@ -93,8 +94,21 @@ module.exports =
 
       if range.isEmpty()
         cursor = selection.cursor
+        line   = cursor.getCurrentBufferLine()
 
-        line = cursor.getCurrentBufferLine()
+        if xikij = atom.packages.getActivePackage('atom-xikij')
+          xikij = xikij.mainModule
+          console.log "have xikij"
+          if m = line.match /^(\s+)[+-]\s(.*)/
+            console.log "xikij line!"
+            body = xikij.getBody cursor.getBufferRow(), {editor}
+            body += "\n" unless body.match /\n$/
+            body += m[1] + "  @path\n"
+            console.log "body", body
+            return xikij.request({body}).then (response) =>
+              console.log response
+              @openFile response.data
+
         col  = cursor.getBufferColumn()
         opts = wordRegex: @filePattern
         start = cursor.getBeginningOfCurrentWordBufferPosition opts
