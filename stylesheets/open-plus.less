@@ -9,15 +9,12 @@
 .open-plus {
 }
 
+atom-text-editor .open-plus .region,
+atom-text-editor .open-plus,
+atom-text-editor::shadow .open-plus,
 atom-text-editor::shadow .open-plus .region {
   background-color: transparent;
   border-radius: @component-border-radius;
   border: 1px solid @syntax-result-marker-color;
-  color: @text-color-info;
-}
-
-atom-text-editor::shadow .open-plus-current .region {
-  border-radius: @component-border-radius;
-  border: 1px solid @syntax-result-marker-color-selected;
   color: @text-color-info;
 }

@@ -22,7 +22,7 @@ module.exports =
   filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
 
   activate: (state) ->
-    atom.commands.add "open-plus:open", => @openPlus()
+    atom.commands.add "atom-workspace", "open-plus:open", => @openPlus()
 
   deactivate: ->
 
@@ -112,15 +112,11 @@ module.exports =
         if not text.match /^[a-z][\w\-]+:/
           if xikij = atom.packages.getActivePackage('atom-xikij')
             xikij = xikij.mainModule
-            console.log "have xikij"
             if m = line.match /^(\s+)[+-]\s(.*)/
-              console.log "xikij line!"
               body = xikij.getBody cursor.getBufferRow(), {editor}
               body += "\n" unless body.match /\n$/
               body += m[1] + "  @filepath\n"
-              console.log "body", body
               return xikij.request({body}).then (response) =>
-                console.log response
                 @openFile response.data
 
         col  = cursor.getBufferColumn()

@@ -1,3 +1,5 @@
+## 0.3.2 - Compatibility to new Atom API (fix)
+
 ## 0.3.1 - Compatibility to new Atom API
 
 ## 0.3.0 - Xikij Support
