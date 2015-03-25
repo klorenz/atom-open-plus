@@ -1,7 +1,7 @@
 open-plus package
 =================
 
-Use ctrl-o to open file of filename under cursor.
+Use ctrl-o to open file specified by filename under cursor.
 
 Open plus opens filenames under cursors or from selections.  Non-absolute
 filenames are interpreted relative to filename of current buffer.
@@ -9,7 +9,7 @@ filenames are interpreted relative to filename of current buffer.
 Binary files and URLs are opened by external application defined by your OS.
 
 If word under cursor has no extension, and resolved file does not exist,
-extension of current file is added to filename.
+extension from current file is added to filename.
 
 
 Xikij Support

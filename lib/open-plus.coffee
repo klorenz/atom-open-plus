@@ -12,6 +12,8 @@ fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
 {Range}      = require 'atom'
 
+osOpen = require "opener"
+
 
 module.exports =
   openPlusView: null
@@ -20,7 +22,7 @@ module.exports =
   filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
 
   activate: (state) ->
-    atom.workspaceView.command "open-plus:open", => @openPlus()
+    atom.commands.add "open-plus:open", => @openPlus()
 
   deactivate: ->
 
@@ -33,12 +35,14 @@ module.exports =
     console.log "filename: #{filename}"
 
     if not filename
-      return atom.workspaceView.trigger "application:open-file"
+      view = atom.views.getView(atom.workspace)
+      return atom.commands.dispatch view, "application:open-file"
 
     # if url scheme match, let system open the file
     if filename.match /^[a-z][\w\-]+:/
       #console.log "use os opener"
-      # scheme!
+      # scheme!deb http://repository.spotify.com stable non-free
+
       osOpen = require "opener"
       return osOpen filename
 
@@ -96,18 +100,28 @@ module.exports =
         cursor = selection.cursor
         line   = cursor.getCurrentBufferLine()
 
-        if xikij = atom.packages.getActivePackage('atom-xikij')
-          xikij = xikij.mainModule
-          console.log "have xikij"
-          if m = line.match /^(\s+)[+-]\s(.*)/
-            console.log "xikij line!"
-            body = xikij.getBody cursor.getBufferRow(), {editor}
-            body += "\n" unless body.match /\n$/
-            body += m[1] + "  @path\n"
-            console.log "body", body
-            return xikij.request({body}).then (response) =>
-              console.log response
-              @openFile response.data
+        col  = cursor.getBufferColumn()
+        opts = wordRegex: @filePattern
+        start = cursor.getBeginningOfCurrentWordBufferPosition opts
+        end   = cursor.getEndOfCurrentWordBufferPosition opts
+
+        range = new Range(start, end)
+        text = editor.getTextInBufferRange range
+
+        # if text is no URL
+        if not text.match /^[a-z][\w\-]+:/
+          if xikij = atom.packages.getActivePackage('atom-xikij')
+            xikij = xikij.mainModule
+            console.log "have xikij"
+            if m = line.match /^(\s+)[+-]\s(.*)/
+              console.log "xikij line!"
+              body = xikij.getBody cursor.getBufferRow(), {editor}
+              body += "\n" unless body.match /\n$/
+              body += m[1] + "  @filepath\n"
+              console.log "body", body
+              return xikij.request({body}).then (response) =>
+                console.log response
+                @openFile response.data
 
         col  = cursor.getBufferColumn()
         opts = wordRegex: @filePattern
@@ -118,7 +132,14 @@ module.exports =
 
       text = editor.getTextInBufferRange range
 
+      marker = editor.markBufferRange range
+      editor.decorateMarker marker, type: "highlight", class: "open-plus"
+
+      setTimeout (-> marker.destroy()), 2000
+
       # cursor was at some whitespace
       text = "" if text.match /\s/
 
       @openFile text
+
+# ../../atom-xikij/

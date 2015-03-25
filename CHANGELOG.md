@@ -1,5 +1,7 @@
+## 0.3.1 - Compatibility to new Atom API
+
 ## 0.3.0 - Xikij Support
-* resolve paths starting with "+" or "-" with xikij (if present) 
+* resolve paths starting with "+" or "-" with xikij (if present)
   before opening
 
 ## 0.2.0 -

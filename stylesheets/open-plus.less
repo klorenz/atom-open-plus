@@ -2,18 +2,22 @@
 //
 // See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
 // for a full listing of what's available.
+//
+
 @import "ui-variables";
 
 .open-plus {
 }
 
-.editor .open-plus .region {
+atom-text-editor::shadow .open-plus .region {
   background-color: transparent;
   border-radius: @component-border-radius;
   border: 1px solid @syntax-result-marker-color;
+  color: @text-color-info;
 }
 
-.editor .open-plus-current .region {
+atom-text-editor::shadow .open-plus-current .region {
   border-radius: @component-border-radius;
   border: 1px solid @syntax-result-marker-color-selected;
+  color: @text-color-info;
 }
