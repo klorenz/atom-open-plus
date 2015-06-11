@@ -57,7 +57,7 @@ module.exports =
       if m[3]
         opts.initialColumn = parseInt(m[3])
 
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
 
     # if filename is not absolute, make it absolute relative to current dir
     if path.resolve(filename) != filename
@@ -85,11 +85,13 @@ module.exports =
             column = opts.initialColumn ? 0
             editor.setCursorBufferPosition [opts.initialLine-1, column]
 
+    console.log "#{filename} : #{opts}";
+
     # open new file
     atom.workspace.open(filename, opts)
 
   openPlus: ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
 
     filePattern = new RegExp @filePattern.source, "g"
     for selection in editor.getSelections()
