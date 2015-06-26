@@ -3,9 +3,9 @@
   "main": "./lib/open-plus",
   "version": "0.4.0",
   "description": "Open filenames under cursor with ctrl-o",
-  "activationEvents": [
-    "open-plus:open"
-  ],
+  "activationCommands": {
+    "atom-text-editor": ["open-plus:open"]
+  },
   "repository": "https://github.com/klorenz/atom-open-plus",
   "license": "MIT",
   "author": "Kay-Uwe (Kiwi) Lorenz <kay@moduleworks.com> (http://quelltexter.com)",

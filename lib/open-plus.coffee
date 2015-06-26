@@ -87,6 +87,8 @@ module.exports =
             column = opts.initialColumn ? 0
             editor.setCursorBufferPosition [opts.initialLine-1, column]
 
+    console.log "#{filename} : #{opts}";
+
     # open new file
     atom.workspace.open(filename, opts)
 
