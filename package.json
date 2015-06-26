@@ -1,10 +1,12 @@
 {
   "name": "open-plus",
   "main": "./lib/open-plus",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Open filenames under cursor with ctrl-o",
   "activationCommands": {
-    "atom-text-editor": ["open-plus:open"]
+    "atom-text-editor": [
+      "open-plus:open"
+    ]
   },
   "repository": "https://github.com/klorenz/atom-open-plus",
   "license": "MIT",
