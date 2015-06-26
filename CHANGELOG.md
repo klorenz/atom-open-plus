@@ -1,3 +1,5 @@
+## 0.4.0 - Compatibility to Atom 1.0 API
+
 ## 0.3.2 - Compatibility to new Atom API (fix)
 
 ## 0.3.1 - Compatibility to new Atom API
