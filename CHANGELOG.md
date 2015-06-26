@@ -1,4 +1,7 @@
-## 0.4.1 - Merged mykz's changes
+
+## 0.4.2 - Rename styles to stylesheets
+
+## 0.4.1 - Merged mykz's changes (Compatibility with Atom 1.0 API)
 
 ## 0.4.0 - Compatibility to Atom 1.0 API
 
