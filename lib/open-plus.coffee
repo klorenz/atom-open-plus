@@ -10,7 +10,9 @@ $ npm install isbinaryfile --save
 path         = require 'path'
 fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
-{Range}      = require 'atom'
+# atom         = require 'atom'
+
+{Range} = atom
 
 osOpen = require "opener"
 
@@ -57,7 +59,7 @@ module.exports =
       if m[3]
         opts.initialColumn = parseInt(m[3])
 
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
 
     # if filename is not absolute, make it absolute relative to current dir
     if path.resolve(filename) != filename
@@ -89,7 +91,7 @@ module.exports =
     atom.workspace.open(filename, opts)
 
   openPlus: ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
 
     filePattern = new RegExp @filePattern.source, "g"
     for selection in editor.getSelections()
