@@ -10,9 +10,7 @@ $ npm install isbinaryfile --save
 path         = require 'path'
 fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
-# atom         = require 'atom'
-
-{Range} = atom
+{Range}      = require 'atom'
 
 osOpen = require "opener"
 
@@ -60,19 +58,27 @@ module.exports =
         opts.initialColumn = parseInt(m[3])
 
     editor = atom.workspace.getActiveTextEditor()
+    absolute = path.dirname(editor.getPath())
 
+    # check file and open it
+    @fileCheckAndOpen filename, absolute, editor, opts
+
+    console.log "#{filename} : #{opts}";
+
+  fileCheckAndOpen: (file, absolute, editor, opts) ->
     # if filename is not absolute, make it absolute relative to current dir
-    if path.resolve(filename) != filename
-      filename = path.resolve path.dirname(editor.getPath()), filename
+    if path.resolve(file) != file
+      filename = path.resolve absolute, file
 
     if not fs.existsSync filename
       # if no extension there, attach extension of current file
       if not path.extname filename
         filename += path.extname editor.getPath()
 
-    # if file exists, open it
+    #if the file exists
     if fs.existsSync filename
       stat = fs.statSync filename
+
       if stat.isDirectory()
         #console.log "open directory"
         return atom.open pathsToOpen: [filename]
@@ -87,10 +93,17 @@ module.exports =
             column = opts.initialColumn ? 0
             editor.setCursorBufferPosition [opts.initialLine-1, column]
 
-    console.log "#{filename} : #{opts}";
+    #if it does not exist
+    else
+      if absolute == ""
+        return
+      absolute = absolute.split("/")
+      absolute.pop()
+      absolute = absolute.join("/")
+      @fileCheckAndOpen file, absolute, editor, opts
 
     # open new file
-    atom.workspace.open(filename, opts)
+    # atom.workspace.open(filename, opts)
 
   openPlus: ->
     editor = atom.workspace.getActiveTextEditor()
