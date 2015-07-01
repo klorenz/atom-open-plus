@@ -66,10 +66,13 @@ module.exports =
     console.log "#{filename} : #{opts}";
 
   fileCheckAndOpen: (file, absolute, editor, opts) ->
+    # have absolute file path able to be used in scope
+    absolutePath = absolute
     # if filename is not absolute, make it absolute relative to current dir
     if path.resolve(file) != file
       filename = path.resolve absolute, file
-
+    else
+      filename = file
     if not fs.existsSync filename
       # if no extension there, attach extension of current file
       if not path.extname filename
@@ -96,14 +99,37 @@ module.exports =
     #if it does not exist
     else
       if absolute == ""
+        atom.confirm
+          message: 'File '+ file + ' does not exist'
+          detailedMessage: 'Create it?'
+          buttons:
+            Ok: ->
+              absolutePath = path.dirname(editor.getPath())
+              absolutePath = absolutePath.split('/').reverse()
+
+              finalPath = path.dirname(editor.getPath())
+              finalPath = finalPath.split('/')
+
+              root = file.split('/').shift()
+
+              for aPath in absolutePath
+                if aPath == root
+                  finalPath.pop()
+                  finalPath = finalPath.join('/')
+                  newFile = path.resolve finalPath, file
+                  atom.workspace.open(newFile, opts)
+                  return
+                else
+                  finalPath.pop()
+                  
+            Cancel: -> return
         return
+
       absolute = absolute.split("/")
       absolute.pop()
       absolute = absolute.join("/")
+      # console.log filename
       @fileCheckAndOpen file, absolute, editor, opts
-
-    # open new file
-    # atom.workspace.open(filename, opts)
 
   openPlus: ->
     editor = atom.workspace.getActiveTextEditor()
