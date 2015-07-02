@@ -19,7 +19,7 @@ module.exports =
   openPlusView: null
   xikij: null
 
-  filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
+  filePattern: /[^\s()!$&'"*+,;={}]+/g # no spaces or sub-delims from url rfc3986
 
   activate: (state) ->
     atom.commands.add "atom-workspace", "open-plus:open", => @openPlus()
