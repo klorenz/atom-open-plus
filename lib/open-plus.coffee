@@ -66,19 +66,17 @@ module.exports =
     console.log "#{filename} : #{opts}";
 
   fileCheckAndOpen: (file, absolute, editor, opts) ->
-    # have absolute file path able to be used in scope
-    absolutePath = absolute
     # if filename is not absolute, make it absolute relative to current dir
-    if path.resolve(file) != file
-      filename = path.resolve absolute, file
-    else
+    if path.isAbsolute(file)
       filename = file
+    else
+      filename = path.resolve absolute, file
     if not fs.existsSync filename
       # if no extension there, attach extension of current file
       if not path.extname filename
         filename += path.extname editor.getPath()
 
-    #if the file exists
+    # if the file exists
     if fs.existsSync filename
       stat = fs.statSync filename
 
@@ -96,39 +94,44 @@ module.exports =
             column = opts.initialColumn ? 0
             editor.setCursorBufferPosition [opts.initialLine-1, column]
 
-    #if it does not exist
+    # if file path does not exist
     else
-      if absolute == ""
+      # do not create anything for absolute paths
+      if path.isAbsolute(file)
+        return
+      # if path reaches root folder
+      if absolute == path.sep
+        # show dialog to create a new file
         atom.confirm
           message: 'File '+ file + ' does not exist'
           detailedMessage: 'Create it?'
           buttons:
             Ok: ->
+              # creates a new path from the file you are currently on
               absolutePath = path.dirname(editor.getPath())
-              absolutePath = absolutePath.split('/').reverse()
+              absolutePath = absolutePath.split(path.sep).reverse()
 
+              # assigns the name of the app root folder and the finalPath
+              root = file.split(path.sep).shift()
               finalPath = path.dirname(editor.getPath())
-              finalPath = finalPath.split('/')
 
-              root = file.split('/').shift()
-
+              # loops through the new path backwards until it finds the app root
               for aPath in absolutePath
                 if aPath == root
-                  finalPath.pop()
-                  finalPath = finalPath.join('/')
+                  # move up one in the file structure one more time
+                  finalPath = path.resolve finalPath, '..'
+                  # resolve the finalPath with the path of the new file and open
                   newFile = path.resolve finalPath, file
                   atom.workspace.open(newFile, opts)
                   return
                 else
-                  finalPath.pop()
-                  
+                  # move up one in the file structure
+                  finalPath = path.resolve finalPath, '..'
             Cancel: -> return
         return
 
-      absolute = absolute.split("/")
-      absolute.pop()
-      absolute = absolute.join("/")
-      # console.log filename
+      absolute = path.resolve absolute, '..'
+
       @fileCheckAndOpen file, absolute, editor, opts
 
   openPlus: ->
