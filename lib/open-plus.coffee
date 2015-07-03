@@ -12,7 +12,7 @@ fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
 # atom         = require 'atom'
 
-{Range} = atom
+{Range} = require 'atom'
 
 osOpen = require "opener"
 
@@ -57,7 +57,7 @@ module.exports =
       filename = m[1]
       opts.initialLine = parseInt(m[2])
       if m[3]
-        opts.initialColumn = parseInt(m[3])
+        opts.initialColumn = parseInt(m[3])-1
 
     editor = atom.workspace.getActiveTextEditor()
 
