@@ -100,7 +100,7 @@ module.exports =
       if path.isAbsolute(file)
         return
       # if path reaches root folder
-      if absolute == path.sep
+      if absolute == path.resolve absolute, '..'
         # show dialog to create a new file
         atom.confirm
           message: 'File '+ file + ' does not exist'
