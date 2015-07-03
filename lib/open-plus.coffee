@@ -10,8 +10,6 @@ $ npm install isbinaryfile --save
 path         = require 'path'
 fs           = require 'fs'
 isBinaryFile = require 'isbinaryfile'
-# atom         = require 'atom'
-
 {Range} = require 'atom'
 
 osOpen = require "opener"
@@ -21,7 +19,7 @@ module.exports =
   openPlusView: null
   xikij: null
 
-  filePattern: /[^\s()!$&'"*+,;=]+/g # no spaces or sub-delims from url rfc3986
+  filePattern: /[^\s()!$&'"*+,;={}]+/g # no spaces or sub-delims from url rfc3986
 
   activate: (state) ->
     atom.commands.add "atom-workspace", "open-plus:open", => @openPlus()
@@ -60,19 +58,28 @@ module.exports =
         opts.initialColumn = parseInt(m[3])-1
 
     editor = atom.workspace.getActiveTextEditor()
+    absolute = path.dirname(editor.getPath())
 
+    # check file and open it
+    @fileCheckAndOpen filename, absolute, editor, opts
+
+    console.log "#{filename} : #{opts}";
+
+  fileCheckAndOpen: (file, absolute, editor, opts) ->
     # if filename is not absolute, make it absolute relative to current dir
-    if path.resolve(filename) != filename
-      filename = path.resolve path.dirname(editor.getPath()), filename
-
+    if path.isAbsolute(file)
+      filename = file
+    else
+      filename = path.resolve absolute, file
     if not fs.existsSync filename
       # if no extension there, attach extension of current file
       if not path.extname filename
         filename += path.extname editor.getPath()
 
-    # if file exists, open it
+    # if the file exists
     if fs.existsSync filename
       stat = fs.statSync filename
+
       if stat.isDirectory()
         #console.log "open directory"
         return atom.open pathsToOpen: [filename]
@@ -87,10 +94,45 @@ module.exports =
             column = opts.initialColumn ? 0
             editor.setCursorBufferPosition [opts.initialLine-1, column]
 
-    console.log "#{filename} : #{opts}";
+    # if file path does not exist
+    else
+      # do not create anything for absolute paths
+      if path.isAbsolute(file)
+        return
+      # if path reaches root folder
+      if absolute == path.sep
+        # show dialog to create a new file
+        atom.confirm
+          message: 'File '+ file + ' does not exist'
+          detailedMessage: 'Create it?'
+          buttons:
+            Ok: ->
+              # creates a new path from the file you are currently on
+              absolutePath = path.dirname(editor.getPath())
+              absolutePath = absolutePath.split(path.sep).reverse()
 
-    # open new file
-    atom.workspace.open(filename, opts)
+              # assigns the name of the app root folder and the finalPath
+              root = file.split(path.sep).shift()
+              finalPath = path.dirname(editor.getPath())
+
+              # loops through the new path backwards until it finds the app root
+              for aPath in absolutePath
+                if aPath == root
+                  # move up one in the file structure one more time
+                  finalPath = path.resolve finalPath, '..'
+                  # resolve the finalPath with the path of the new file and open
+                  newFile = path.resolve finalPath, file
+                  atom.workspace.open(newFile, opts)
+                  return
+                else
+                  # move up one in the file structure
+                  finalPath = path.resolve finalPath, '..'
+            Cancel: -> return
+        return
+
+      absolute = path.resolve absolute, '..'
+
+      @fileCheckAndOpen file, absolute, editor, opts
 
   openPlus: ->
     editor = atom.workspace.getActiveTextEditor()
