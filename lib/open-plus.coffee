@@ -14,8 +14,15 @@ isBinaryFile = require 'isbinaryfile'
 
 osOpen = require "opener"
 
-
 module.exports =
+  config:
+    confirmOpenNewFile:
+      type: "boolean"
+      default: false
+
+    #searchBackFor
+
+
   openPlusView: null
   xikij: null
 
@@ -65,12 +72,69 @@ module.exports =
 
     console.log "#{filename} : #{opts}";
 
+  createFile: (filename, opts) ->
+    {findMatchingPath, editor} = opts
+
+    if not path.extname filename
+      filename += path.extname editor.getPath()
+
+    currentFileDir = path.dirname(editor.getPath())
+
+    newFile = null
+    if not findMatchingPath
+      newFile = path.resolve currentFileDir, filename
+
+    else
+      newFile = path.resolve currentFileDir, filename
+
+      # if there is no relative path in filename
+      if path.sep in filename
+        pathElements = currentFileDir.split(path.sep).reverse()
+
+        # find relative path of current file to project root
+        for prjdir in atom.project.rootDirectories
+          if currentFileDir.startsWith prjdir.path
+            relpath = path.relative(currentFileDir, prjdir)
+            pathElements = relpath.split(path.sep).reverse()
+            break
+
+        finalPath    = currentFileDir
+
+        anchor = filename.split(path.sep).shift()
+
+        # loops through the new path backwards until it finds the app root
+        # TODO: stop on project root ?
+        for aPath in pathElements
+          if aPath != anchor
+            # move up one in the file structure
+            finalPath = path.resolve finalPath, '..'
+          else
+            # move up one in the file structure one more time
+            finalPath = path.resolve finalPath, '..'
+            # resolve the finalPath with the path of the new file and open
+            newFile = path.resolve finalPath, filename
+            break
+
+    return unless newFile
+
+    if not atom.config.get('open-plus.confirmOpenNewFile')
+      atom.workspace.open(newFile, opts)
+
+    else
+      atom.confirm
+        message: 'File '+ newFile + ' does not exist'
+        detailedMessage: 'Create it?'
+        buttons:
+          Ok: -> atom.workspace.open(newFile, opts)
+          Cancel: -> return
+
   fileCheckAndOpen: (file, absolute, editor, opts) ->
     # if filename is not absolute, make it absolute relative to current dir
     if path.isAbsolute(file)
       filename = file
     else
       filename = path.resolve absolute, file
+
     if not fs.existsSync filename
       # if no extension there, attach extension of current file
       if not path.extname filename
@@ -98,41 +162,16 @@ module.exports =
     else
       # do not create anything for absolute paths
       if path.isAbsolute(file)
-        return
-      # if path reaches root folder
-      if absolute == path.sep
-        # show dialog to create a new file
-        atom.confirm
-          message: 'File '+ file + ' does not exist'
-          detailedMessage: 'Create it?'
-          buttons:
-            Ok: ->
-              # creates a new path from the file you are currently on
-              absolutePath = path.dirname(editor.getPath())
-              absolutePath = absolutePath.split(path.sep).reverse()
+        @createFile file, findMatchingPath: false, editor: editor
 
-              # assigns the name of the app root folder and the finalPath
-              root = file.split(path.sep).shift()
-              finalPath = path.dirname(editor.getPath())
+      # reached the project root path
+      else if absolute in (r.path for r in atom.project.rootDirectories)
+        @createFile file, findMatchingPath: true, editor: editor
 
-              # loops through the new path backwards until it finds the app root
-              for aPath in absolutePath
-                if aPath == root
-                  # move up one in the file structure one more time
-                  finalPath = path.resolve finalPath, '..'
-                  # resolve the finalPath with the path of the new file and open
-                  newFile = path.resolve finalPath, file
-                  atom.workspace.open(newFile, opts)
-                  return
-                else
-                  # move up one in the file structure
-                  finalPath = path.resolve finalPath, '..'
-            Cancel: -> return
-        return
+      else
+        absolute = path.resolve absolute, '..'
 
-      absolute = path.resolve absolute, '..'
-
-      @fileCheckAndOpen file, absolute, editor, opts
+        @fileCheckAndOpen file, absolute, editor, opts
 
   openPlus: ->
     editor = atom.workspace.getActiveTextEditor()
@@ -174,14 +213,18 @@ module.exports =
 
       text = editor.getTextInBufferRange range
 
-      marker = editor.markBufferRange range
-      editor.decorateMarker marker, type: "highlight", class: "open-plus"
+      # create marker
+      (->
+        marker = editor.markBufferRange range
+        editor.decorateMarker marker, type: "highlight", class: "open-plus"
 
-      setTimeout (-> marker.destroy()), 2000
+        setTimeout (-> marker.destroy()), 2000
+      )()
 
       # cursor was at some whitespace
       text = "" if text.match /\s/
 
-      @openFile text
+      # do this as timeout to have visual feedback of markers
+      setTimeout (=> @openFile text), 500
 
 # ../../atom-xikij/
