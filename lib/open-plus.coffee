@@ -135,17 +135,6 @@ module.exports =
     else
       filename = path.resolve absolute, file
 
-    if not fs.existsSync filename
-      dirname = path.dirname filename
-      # find the exists directory while walking the tree
-      if fs.existsSync dirname
-          files = fs.readdirSync dirname
-          for file in files
-              # find the file that matches the one you are selecting
-              if file.indexOf(path.basename filename) > -1
-                  sep = path.sep
-                  filename = dirname + sep + file
-
     # if the file exists
     if fs.existsSync filename
       stat = fs.statSync filename
@@ -166,6 +155,7 @@ module.exports =
 
     # if file path does not exist
     else
+      dirname = path.dirname filename
       # do not create anything for absolute paths
       if path.isAbsolute(file)
         @createFile file, findMatchingPath: false, editor: editor
@@ -173,6 +163,17 @@ module.exports =
       # reached the project root path
       else if absolute in (r.path for r in atom.project.rootDirectories)
         @createFile file, findMatchingPath: true, editor: editor
+
+      # find if directory exists while walking the tree
+      else if fs.existsSync dirname
+          # read the directory and find if there is a file that matches the selected file
+          files = fs.readdirSync dirname
+          for file in files
+              if file.indexOf(path.basename filename) > -1
+                  sep = path.sep
+                  filename = dirname + sep + file
+          # restart the file checking process with either new extension or same filename
+          @fileCheckAndOpen(filename, absolute, editor, opts)
 
       else
         absolute = path.resolve absolute, '..'
