@@ -1,3 +1,10 @@
+## 0.7.0 - Add scss special file handling with "_"
+
+Thanks to aledemann
+
+## 0.6.0 - New files can be anchored at a folder relative to project root (see #7)
+
+Thanks to ChuckPierce :)
 
 ## 0.4.2 - Rename styles to stylesheets
 
