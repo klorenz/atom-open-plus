@@ -136,21 +136,15 @@ module.exports =
       filename = path.resolve absolute, file
 
     if not fs.existsSync filename
-      filenameExtension = path.extname filename
-      currentFileExtension = path.extname editor.getPath()
-
-      # if no extension there, attach extension of current file
-      if not filenameExtension
-        # if there is no extension, and it is a sass file
-        if currentFileExtension == '.scss'
-          filenameFile = filename.substring(filename.lastIndexOf('/') + 1, filename.length)
-          # if the filename does not already start with _ ... add the underscore.
-          # Fixes https://github.com/klorenz/atom-open-plus/issues/15
-          if filenameFile.substring(0, 1) != '_'
-            filenamePath = filename.substring(0, filename.lastIndexOf('/') + 1)
-            filename = filenamePath + '_' + filenameFile + currentFileExtension
-        else
-          filename += currentFileExtension
+      dirname = path.dirname filename
+      # find the exists directory while walking the tree
+      if fs.existsSync dirname
+          files = fs.readdirSync dirname
+          for file in files
+              # find the file that matches the one you are selecting
+              if file.indexOf(path.basename filename) > -1
+                  sep = path.sep
+                  filename = dirname + sep + file
 
     # if the file exists
     if fs.existsSync filename
