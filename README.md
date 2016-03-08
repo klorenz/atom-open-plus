@@ -1,6 +1,8 @@
 open-plus package
 =================
 
+[![Build Status](https://travis-ci.org/klorenz/atom-open-plus.svg?branch=master)](https://travis-ci.org/klorenz/atom-open-plus)
+
 Use ctrl-o to open file specified by filename under cursor.
 
 Open plus opens filenames under cursors or from selections.  Non-absolute
