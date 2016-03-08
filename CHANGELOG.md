@@ -1,3 +1,5 @@
+## 0.8.1 - Add Travis CI
+
 ## 0.8.0 - Restructuring
 
 - Change from filename extension method to directory method (see #12)
