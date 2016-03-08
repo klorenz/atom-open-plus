@@ -1,26 +1,13 @@
 """
-
-$ npm install opener --save
-$ npm install isbinaryfile --save
-  isbinaryfile@2.0.1 ../node_modules/isbinaryfile
-  npm http GET https://registry.npmjs.org/isbinaryfile
-  npm http 200 https://registry.npmjs.org/isbinaryfile
 """
 
-path         = require 'path'
-fs           = require 'fs'
-isBinaryFile = require 'isbinaryfile'
-{Range} = require 'atom'
-
+{OpenPlusOpener} = require './open-plus-opener.coffee'
 
 module.exports =
   config:
     confirmOpenNewFile:
       type: "boolean"
       default: false
-
-    #searchBackFor
-
 
   openPlusView: null
   xikij: null

@@ -192,12 +192,11 @@ class OpenPlusOpener
       text = editor.getTextInBufferRange range
 
       # create marker
-      (->
+      do ->
         marker = editor.markBufferRange range
         editor.decorateMarker marker, type: "highlight", class: "open-plus"
 
         setTimeout (-> marker.destroy()), 2000
-      )()
 
       # cursor was at some whitespace
       text = "" if text.match /\s/
