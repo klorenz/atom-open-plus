@@ -1,3 +1,7 @@
+## 0.8.0 - Change from filename extension method to directory method (see #12)
+
+Thanks to ChuckPierce :)
+
 ## 0.7.0 - Add scss special file handling with "_"
 
 Thanks to aledemann

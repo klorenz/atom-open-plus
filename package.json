@@ -8,14 +8,20 @@
       "open-plus:open"
     ]
   },
+  "atomTestRunner": "./spec/atom-test-runner.coffee",
+  "scripts": {
+    "test": "apm test"
+  },
   "repository": "https://github.com/klorenz/atom-open-plus",
   "license": "MIT",
   "author": "Kay-Uwe (Kiwi) Lorenz <kay@moduleworks.com> (http://quelltexter.com)",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">1.0.0"
   },
   "dependencies": {
     "isbinaryfile": "^2.0.1",
-    "opener": "^1.4.0"
+    "ncp": "^2.0.0",
+    "opener": "^1.4.0",
+    "tmp": "0.0.28"
   }
 }
