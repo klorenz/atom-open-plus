@@ -1,6 +1,14 @@
-## 0.8.0 - Change from filename extension method to directory method (see #12)
+## 0.8.0 - Restructuring
 
-Thanks to ChuckPierce :)
+- Change from filename extension method to directory method (see #12)
+
+  Thanks to ChuckPierce :)
+
+- Restructured code for beeing able to run tests
+
+- Fix styles, which caused a display bug in highlighting the selected
+  word.
+
 
 ## 0.7.0 - Add scss special file handling with "_"
 
