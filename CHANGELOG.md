@@ -1,3 +1,7 @@
+## 0.8.2 - Bug fix release
+
+- Fix issue #19
+
 ## 0.8.1 - Add Travis CI
 
 ## 0.8.0 - Restructuring

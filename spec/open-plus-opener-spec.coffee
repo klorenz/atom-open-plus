@@ -74,6 +74,15 @@ describe "OpenPlusOpener", ->
         expect(status.method).toBe "fileOpen"
         expect(status.opts).toEqual {initialLine: 4, initialColumn: 1}
 
+    fit "crawls folders up trying to find the path to open", ->
+      opener.open("module/dir/include", "#{rootDir}/somedir/deeper/test.coffee")
+      waitsFor ->
+        status
+      runs ->
+        expect(status.filename).toBe "#{rootDir}/module/dir/include.coffee"
+        expect(status.method).toBe "fileOpen"
+
+
 #
 #     # it opens a file at correct line
 #

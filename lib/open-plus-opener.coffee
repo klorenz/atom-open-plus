@@ -89,14 +89,16 @@ class OpenPlusOpener
           Ok: -> @fileOpen(newFile, {})
           Cancel: -> return
 
-  findAndOpen: (fileName, contextFileName, opts) ->
-    absolute = path.dirname contextFileName
+  findAndOpen: (fileName, contextFileName, opts, absolute) ->
+    absolute ?= path.dirname contextFileName
 
     # if filename is not absolute, make it absolute relative to current dir
     if path.isAbsolute(fileName)
       filename = fileName
     else
       filename = path.resolve absolute, fileName
+
+    debugger
 
     # if the file exists
     if fs.existsSync filename
@@ -150,7 +152,7 @@ class OpenPlusOpener
       else
         absolute = path.resolve absolute, '..'
 
-        @findAndOpen fileName, contextFileName, opts
+        @findAndOpen fileName, contextFileName, opts, absolute
 
   openFromSelections: (editor) ->
     filePattern = new RegExp @filePattern.source, "g"
