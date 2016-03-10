@@ -74,7 +74,7 @@ describe "OpenPlusOpener", ->
         expect(status.method).toBe "fileOpen"
         expect(status.opts).toEqual {initialLine: 4, initialColumn: 1}
 
-    fit "crawls folders up trying to find the path to open", ->
+    it "crawls folders up trying to find the path to open", ->
       opener.open("module/dir/include", "#{rootDir}/somedir/deeper/test.coffee")
       waitsFor ->
         status
