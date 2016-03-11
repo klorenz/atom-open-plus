@@ -56,7 +56,7 @@ module.exports =
     atom.open pathsToOpen: [filename]
 
   getRootDirs: ->
-    atom.project.rootDirectories()
+    atom.project.rootDirectories
 
 
 # ../../atom-xikij/

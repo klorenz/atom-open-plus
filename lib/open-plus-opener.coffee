@@ -53,9 +53,9 @@ class OpenPlusOpener
         pathElements = currentFileDir.split(path.sep).reverse()
 
         # find relative path of current file to project root
-        for prjdir in @getRootDirectories()
+        for prjdir in @getRootDirs()
           if currentFileDir.startsWith prjdir.path
-            relpath = path.relative(currentFileDir, prjdir)
+            relpath = path.relative(currentFileDir, prjdir.path)
             pathElements = relpath.split(path.sep).reverse()
             break
 
@@ -97,8 +97,6 @@ class OpenPlusOpener
       filename = fileName
     else
       filename = path.resolve absolute, fileName
-
-    debugger
 
     # if the file exists
     if fs.existsSync filename
