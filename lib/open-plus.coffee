@@ -21,6 +21,20 @@ module.exports =
     atom.commands.add "atom-workspace", "open-plus:open", =>
       @openPlusOpener.openFromSelections atom.workspace.getActiveTextEditor()
 
+    atom.workspace.observeTextEditors (editor) =>
+      view = atom.views.getView(editor)
+
+      view.addEventListener 'keydown', (event) =>
+        if @clickedPosition? and event.which is 17
+          @openPlusOpener.openFromSelections editor
+
+      view.addEventListener 'mousedown', (event) =>
+        component = view.component
+        @clickedPosition = component.screenPositionForMouseEvent(event)
+
+      view.addEventListener 'mouseup', (event) =>
+        @clickedPosition = null
+
   deactivate: ->
 
   serialize: ->

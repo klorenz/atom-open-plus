@@ -3,11 +3,6 @@
   "main": "./lib/open-plus",
   "version": "0.8.2",
   "description": "Open filenames under cursor with ctrl-o",
-  "activationCommands": {
-    "atom-text-editor": [
-      "open-plus:open"
-    ]
-  },
   "atomTestRunner": "./spec/atom-test-runner.coffee",
   "scripts": {
     "test": "apm test"

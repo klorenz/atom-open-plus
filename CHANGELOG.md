@@ -1,3 +1,8 @@
+## 0.9.0 - Implement open on click
+
+- As requested in issue #1.  You click at a file, keep the 
+  mousebutton pressed and then press ctrl.
+
 ## 0.8.2 - Bug fix release
 
 - Fix issue #19

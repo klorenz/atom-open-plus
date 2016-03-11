@@ -13,6 +13,9 @@ Binary files and URLs are opened by external application defined by your OS.
 If word under cursor has no extension, and resolved file does not exist,
 extension from current file is added to filename.
 
+If you click at a filename, keep the left mouse-button pressed and then hit the
+(left) ctrl-key, it will also open the file, you clicked at.
+
 
 Xikij Support
 -------------
