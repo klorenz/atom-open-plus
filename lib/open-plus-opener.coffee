@@ -4,10 +4,11 @@ isBinaryFile = require 'isbinaryfile'
 {Range} = require 'atom'
 
 class OpenPlusOpener
-  constructor: ({@osOpen, @dirOpen, @fileOpen, @appOpen, @getRootDirs, @filePattern}) ->
+  constructor: ({@osOpen, @dirOpen, @fileOpen, @appOpen, @ambigiousOpen, @getRootDirs, @filePattern}) ->
     @filePattern ?= /[^\s()!$&'"*+,;={}]+/g # no spaces or sub-delims from url rfc3986
 
   open: (filename, contextFileName) ->
+
     if not filename
       return @appOpen()
 
@@ -117,59 +118,106 @@ class OpenPlusOpener
     else
 
       dirname = path.dirname filename
+
       # do not create anything for absolute paths
       if path.isAbsolute(fileName)
         @createFile fileName, {findMatchingPath: false, contextFileName}
 
       # reached the project root path
-      else if absolute in (r.path for r in atom.project.rootDirectories)
+      else if absolute in (r.path for r in @getRootDirs())
         @createFile fileName, {findMatchingPath: true, contextFileName}
 
       # find if directory exists while walking the tree
       else if fs.existsSync dirname
-          # read the directory and find if there is a file that matches the selected file
-          files = fs.readdirSync dirname
-          matches = []
-          for file in files
-              if (index = file.indexOf(path.basename filename)) > -1
-                if index == 1 && file[0] == '_'
-                  # TODO: do sccs_check
-                else if index == 0  # this is the real file
-                  sep = path.sep
-                  filename = dirname + sep + file
-                  matches.push filename
-                else # fuzzy!
-                  # TODO: handle fuzzy
+        matches = @findMatchingFile dirname, fileName
 
-#          if matches.length > 1
-            # TODO: ambigious filename
+        info = path.parse(absolute)
+        if matches.length is 0 and info.root == info.dir
+          for r in @getRootDirs()
+            matches += @findMatchingFile r, fileName
 
+          if matches.length == 0
+            return @createFile fileName, {findMatchingPath: false, contextFileName}
+
+        if matches.length > 1
+
+          # interactively select correct file
+          if @ambigiousOpen?
+            return @ambigiousOpen matches, (filename) =>
+              @findAndOpen(filename, contextFileName, opts)
+          else
+            @findAndOpen(matches[0], contextFileName, opts)
+
+        else if matches.length == 1
+          @findAndOpen(matches[0], contextFileName, opts)
+        else
+          absolute = path.resolve absolute, '..'
           # restart the file checking process with either new extension or same filename
-          @findAndOpen(filename, contextFileName, opts)
+          @findAndOpen(filename, contextFileName, opts, absolute)
 
       else
         absolute = path.resolve absolute, '..'
 
         @findAndOpen fileName, contextFileName, opts, absolute
 
+  findMatchingFile: (dirname, fileName) ->
+    # read the directory and find if there is a file that matches the selected file
+    files = fs.readdirSync dirname
+    matches = []
+    for file in files
+      if (index = file.indexOf(path.basename fileName)) > -1
+        if index == 1 && file[0] == '_'
+          # TODO: do sccs_check
+        else if index == 0  # this is the real file
+          sep = path.sep
+          matches.push dirname + sep + file
+        else # fuzzy!
+          # TODO: handle fuzzy
+
+#          if matches.length > 1
+      # TODO: ambigious filename
+
+    matches
+
   openFromSelections: (editor) ->
     filePattern = new RegExp @filePattern.source, "g"
 
     for selection in editor.getSelections()
-      #console.log "selection", selection
       range = selection.getBufferRange()
 
       if range.isEmpty()
         cursor = selection.cursor
-        line   = cursor.getCurrentBufferLine()
+        opts = wordRegex: filePattern
 
-        col  = cursor.getBufferColumn()
-        opts = wordRegex: @filePattern
+        if not cursor.isInsideWord(opts)
+          @appOpen()
+          continue
+
         start = cursor.getBeginningOfCurrentWordBufferPosition opts
         end   = cursor.getEndOfCurrentWordBufferPosition opts
 
+        debugger
+        # if right of a space and right before a word ...
+        range = selection.getBufferRange()
+        if range.start.column > 0
+          range.start.column -= 1
+          if editor.getTextInBufferRange(range) == " "
+            cursor.moveRight()
+            start = cursor.getBeginningOfCurrentWordBufferPosition opts
+            end   = cursor.getEndOfCurrentWordBufferPosition opts
+            cursor.moveLeft()
+
         range = new Range(start, end)
         text = editor.getTextInBufferRange range
+
+        if m = text.match /^\[\[(.*)\]\]$/
+          text = m[1]
+          if m = text.match /^[^|]+\|(.*)$/
+            text = m[1]
+          else
+            text = text.replace(/\s+/, '-')
+
+        line   = cursor.getCurrentBufferLine()
 
         # if text is no URL
         if not text.match /^[a-z][\w\-]+:/
@@ -182,14 +230,20 @@ class OpenPlusOpener
               return xikij.request({body}).then (response) =>
                 @openFile response.data
 
-        col  = cursor.getBufferColumn()
-        opts = wordRegex: @filePattern
-        start = cursor.getBeginningOfCurrentWordBufferPosition opts
-        end   = cursor.getEndOfCurrentWordBufferPosition opts
+        # opts = wordRegex: @filePattern
+        # start = cursor.getBeginningOfCurrentWordBufferPosition opts
+        # end   = cursor.getEndOfCurrentWordBufferPosition opts
 
-        range = new Range(start, end)
+        #range = new Range(start, end)
 
       text = editor.getTextInBufferRange range
+
+      if m = text.match /^\[\[(.*)\]\]$/
+        text = m[1]
+        if m = text.match /^[^|]+\|(.*)$/
+          text = m[1]
+        else
+          text = text.replace(/\s+/, '-')
 
       # create marker
       do ->

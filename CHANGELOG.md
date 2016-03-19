@@ -1,3 +1,12 @@
+## 0.10.0 
+
+- Add ambigiousOpen handler (it is intended later to present a selection 
+  list, if multiple files match the pattern)
+
+- Improve handling of open-plus on word boundaries and in non-word areas
+
+- make open plus with click configurable
+
 ## 0.9.1 - Bug fix release
 
 - Fix #14 opening a not-existing path
