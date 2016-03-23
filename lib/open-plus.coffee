@@ -73,12 +73,13 @@ module.exports =
       view.removeEventListener 'mouseup', @onMouseUp
       view.removeEventListener 'mousedown', @onMouseDown
       view.removeEventListener 'keydown', @onKeyDown
-      @clickObserver.dispose()
+
+    @clickObserver?.dispose()
     @clickObserver = null
 
   deactivate: ->
     @disableClickForOpen()
-    @subscriptions.dispose()
+    @subscriptions?.dispose()
 
   serialize: ->
 
