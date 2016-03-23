@@ -1,3 +1,8 @@
+## 0.10.1
+
+- make open plus with click configurable: fix indentation in a function, which
+  causes an exception (cannot read property 'dispose' of undefined)
+
 ## 0.10.0 
 
 - Add ambigiousOpen handler (it is intended later to present a selection 
