@@ -1,7 +1,7 @@
 {
   "name": "open-plus",
   "main": "./lib/open-plus",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Open filenames under cursor with ctrl-o",
   "atomTestRunner": "./spec/atom-test-runner.coffee",
   "scripts": {
